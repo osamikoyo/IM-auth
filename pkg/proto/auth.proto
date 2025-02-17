@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "./pkg/pb";
+
 service AuthService{
     rpc Register (User) returns (Response);
     rpc Login (LoginRequest) returns (LoginResp);

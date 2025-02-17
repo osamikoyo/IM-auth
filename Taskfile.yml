@@ -11,3 +11,6 @@ tasks:
   proto:
     cmds:
       - protoc --go_out=. --go-grpc_out=. pkg/proto/auth.proto
+  deps:
+    cmds:
+      - go mod download
