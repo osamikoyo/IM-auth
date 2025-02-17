@@ -1,8 +1,39 @@
 syntax = "proto3";
 
+service AuthService{
+    rpc Register (User) returns (Response);
+    rpc Login (LoginRequest) returns (LoginResp);
+    rpc Auth (CheckTokenReq) returns (CheckTokenResp);
+}
+
 message User{
     uint64 ID = 1;
     string Username = 2;
     string Email = 3;
     string Password = 4;
+}
+
+message Response{
+    string Error = 1;
+    int32 Status = 2;
+}
+
+message LoginRequest{
+    string Email = 1;
+    string Password = 2;
+}
+
+message LoginResp{
+    Response response = 1;
+    string Token = 2;
+}
+
+message CheckTokenReq{
+    string Token = 1;
+}
+
+message CheckTokenResp{
+    Response response = 1;
+    uint64 ID = 2;
+    bool OK = 3;
 }
