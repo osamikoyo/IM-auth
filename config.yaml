@@ -1,0 +1,3 @@
+port : 50051
+hostname : "localhost"
+dsn : "storage/main.db"
