@@ -66,3 +66,29 @@ func (s *Storage) Login(email, password string) (string, error) {
 
 	return generateJWT(user.ID, s.key)
 }
+
+func (s *Storage) Auth(token string) (uint64, bool, error) {
+	if token == "" {
+		return 0, false, nil
+	}
+
+		tokens, err := jwt.Parse(token[len("Bearer "):], func(token *jwt.Token) (interface{}, error) {
+            return s.key, nil
+        })
+
+		if err != nil || !tokens.Valid{
+			return 0, false, err
+		}
+
+		claims, ok := tokens.Claims.(jwt.MapClaims)
+		if !ok {
+			return 0, false, nil
+		}
+
+		id, ok := claims["id"].(float64)
+		if !ok {
+			return 0, false, nil
+		}
+		
+		return uint64(id), true, nil
+}
