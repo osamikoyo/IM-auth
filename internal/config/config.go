@@ -10,6 +10,7 @@ type Config struct {
 	Port uint `yaml:"port"`
 	Hostname string `yaml:"hostname"`
 	DSN string `yaml:"dsn"`
+	JwtKey string `yaml:"jwt_key"`
 }
 
 func Load(cfgPath string) (*Config, error) {

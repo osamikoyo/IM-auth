@@ -1,6 +1,9 @@
 package models
 
-import "github.com/osamikoyo/IM-auth/pkg/pb"
+import (
+	"github.com/golang-jwt/jwt"
+	"github.com/osamikoyo/IM-auth/pkg/pb"
+)
 
 type User struct{
 	ID uint64 `gorm:"primaryKey;autoIncrement"`
@@ -25,4 +28,10 @@ func ToProtoBuf(u *User) *pb.User {
 		Password: u.Password,
 		Username: u.Username,
 	}
+}
+
+type Claims struct {
+	ID uint64
+	Email string
+	jwt.StandardClaims
 }

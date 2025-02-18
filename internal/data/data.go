@@ -1,15 +1,18 @@
 package data
 
 import (
+	"github.com/golang-jwt/jwt"
 	"github.com/osamikoyo/IM-auth/internal/config"
 	"github.com/osamikoyo/IM-auth/internal/data/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"time"
 )
 
 type Storage struct {
 	db *gorm.DB
+	key string
 }
 
 func New(cfg *config.Config) (*Storage, error) {
@@ -34,9 +37,16 @@ func (s *Storage) Register(user *models.User) error {
 	return s.db.Create(user).Error
 }
 
-func generateToken(user *models.User) (string, error){
-	jwts, err := 
+func generateJWT(id uint64, key string) (string, error) {
+	claims := jwt.MapClaims{
+		"id" : id,
+		"exp" : time.Now().Add(180 * time.Hour).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(key)
 }
+
 
 func (s *Storage) Login(email, password string) (string, error) {
 	var user models.User
@@ -48,11 +58,11 @@ func (s *Storage) Login(email, password string) (string, error) {
 
 	result := s.db.Where(&models.User{
 		Email: email,
-		Password: password,
+		Password: string(hash),
 	}).Find(&user)
 	if result.Error != nil{
 		return "", err
 	}
 
-
+	return generateJWT(user.ID, s.key)
 }
