@@ -2,9 +2,12 @@ package server
 
 import (
 	"context"
+	"errors"
 	"github.com/osamikoyo/IM-auth/internal/data"
+	"github.com/osamikoyo/IM-auth/internal/data/models"
 	"github.com/osamikoyo/IM-auth/pkg/pb"
 	"google.golang.org/grpc"
+	"net/http"
 )
 
 type Server struct{
@@ -12,6 +15,60 @@ type Server struct{
 	pb.UnimplementedAuthServiceServer
 }
 
-func (s *Server) Register(_ context.Context, in *pb.User, opts ...grpc.CallOption) (*pb.Response, error){}
-func (s *Server) Login(_ context.Context, in *pb.LoginRequest, opts ...grpc.CallOption) (*pb.LoginResp, error){}
-func (s *Server) Auth(_ context.Context, in *pb.CheckTokenReq, opts ...grpc.CallOption) (*pb.CheckTokenResp, error) {}
+func (s *Server) Register(_ context.Context, in *pb.User, opts ...grpc.CallOption) (*pb.Response, error){
+	err := s.Storage.Register(models.ToModels(in))
+	if err != nil{
+		return &pb.Response{
+			Error: err.Error(),
+			Status: http.StatusInternalServerError,
+		}, err
+	}
+
+	return &pb.Response{
+		Status: http.StatusCreated,
+		Error: "",
+	}, nil
+}
+func (s *Server) Login(_ context.Context, in *pb.LoginRequest, opts ...grpc.CallOption) (*pb.LoginResp, error){
+	token, err := s.Storage.Login(in.Email, in.Password)
+	if err != nil{
+		return &pb.LoginResp{
+			Response: &pb.Response{
+				Error: err.Error(),
+				Status: http.StatusInternalServerError,
+			},
+		}, nil
+	}
+
+	return &pb.LoginResp{
+		Response: &pb.Response{
+			Status: http.StatusOK,
+			Error: "",
+		},
+		Token: token,
+	}, nil
+}
+func (s *Server) Auth(_ context.Context, in *pb.CheckTokenReq, opts ...grpc.CallOption) (*pb.CheckTokenResp, error) {
+	id, ok, err := s.Storage.Auth(in.Token)
+	if err != nil{
+		return &pb.CheckTokenResp{
+			Response: &pb.Response{
+				Error: err.Error(),
+				Status: http.StatusInternalServerError,
+			},
+		}, err
+	}
+
+	if !ok {
+		return &pb.CheckTokenResp{
+			Response: &pb.Response{
+				Error: "auth not ok",
+				Status: http.StatusInternalServerError,
+			},
+		}, errors.New("auth not ok")
+	}
+
+	return &pb.CheckTokenResp{
+		ID: id,
+	}, nil
+}
