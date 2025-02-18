@@ -8,7 +8,8 @@ package pb
 
 import (
 	context "context"
-	grpc "google.golang.org/grpc"
+    "github.com/osamikoyo/IM-auth/internal/server"
+    grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 )
@@ -107,7 +108,7 @@ type UnsafeAuthServiceServer interface {
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
-func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
+func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv *server.Server) {
 	// If the following call pancis, it indicates UnimplementedAuthServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
