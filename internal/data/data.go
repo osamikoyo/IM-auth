@@ -26,15 +26,16 @@ func New(cfg *config.Config) (*Storage, error) {
 	}, nil
 }
 
-func (s *Storage) Register(user *models.User) error {
+func (s *Storage) Register(user *models.User) (uint64, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil{
-		return err
+		return 1, err
 	}
 
 	user.Password = string(hash)
 
-	return s.db.Create(user).Error
+	err = s.db.Create(user).Error
+	return user.ID, err
 }
 
 func generateJWT(id uint64, key string) (string, error) {

@@ -3,13 +3,16 @@ package server
 import (
 	"context"
 	"errors"
+	"net/http"
+
 	"github.com/osamikoyo/IM-auth/internal/data"
 	"github.com/osamikoyo/IM-auth/internal/data/models"
+	"github.com/osamikoyo/IM-auth/internal/rpc"
 	"github.com/osamikoyo/IM-auth/pkg/pb"
-	"net/http"
 )
 
 type Server struct{
+	RpcClient *rpc.RpcClient
 	Storage *data.Storage
 	pb.UnimplementedAuthServiceServer
 }
@@ -22,6 +25,8 @@ func (s *Server) Register(_ context.Context, in *pb.User) (*pb.Response, error){
 			Status: http.StatusInternalServerError,
 		}, err
 	}
+
+	err = s.RpcClient.Send()
 
 	return &pb.Response{
 		Status: http.StatusCreated,
