@@ -18,7 +18,7 @@ type Server struct{
 }
 
 func (s *Server) Register(_ context.Context, in *pb.User) (*pb.Response, error){
-	err := s.Storage.Register(models.ToModels(in))
+	id, err := s.Storage.Register(models.ToModels(in))
 	if err != nil{
 		return &pb.Response{
 			Error: err.Error(),
@@ -26,7 +26,13 @@ func (s *Server) Register(_ context.Context, in *pb.User) (*pb.Response, error){
 		}, err
 	}
 
-	err = s.RpcClient.Send()
+	err = s.RpcClient.Send(id)
+	if err != nil{
+		return &pb.Response{
+			Error: err.Error(),
+			Status: http.StatusInternalServerError,
+		}, err
+	}
 
 	return &pb.Response{
 		Status: http.StatusCreated,
