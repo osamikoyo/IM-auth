@@ -12,6 +12,7 @@ type Config struct {
 	DSN string `yaml:"dsn"`
 	JwtKey string `yaml:"jwt_key"`
 	RpcQueName string `yaml:"rpc_que_name"`
+	AmqpConnect string `yaml:"amqp_connect"`
 }
 
 func Load(cfgPath string) (*Config, error) {
