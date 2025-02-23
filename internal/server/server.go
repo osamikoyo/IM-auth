@@ -6,7 +6,6 @@ import (
 	"github.com/osamikoyo/IM-auth/internal/data"
 	"github.com/osamikoyo/IM-auth/internal/data/models"
 	"github.com/osamikoyo/IM-auth/pkg/pb"
-	"google.golang.org/grpc"
 	"net/http"
 )
 
@@ -15,7 +14,7 @@ type Server struct{
 	pb.UnimplementedAuthServiceServer
 }
 
-func (s *Server) Register(_ context.Context, in *pb.User, opts ...grpc.CallOption) (*pb.Response, error){
+func (s *Server) Register(_ context.Context, in *pb.User) (*pb.Response, error){
 	err := s.Storage.Register(models.ToModels(in))
 	if err != nil{
 		return &pb.Response{
@@ -29,7 +28,7 @@ func (s *Server) Register(_ context.Context, in *pb.User, opts ...grpc.CallOptio
 		Error: "",
 	}, nil
 }
-func (s *Server) Login(_ context.Context, in *pb.LoginRequest, opts ...grpc.CallOption) (*pb.LoginResp, error){
+func (s *Server) Login(_ context.Context, in *pb.LoginRequest) (*pb.LoginResp, error){
 	token, err := s.Storage.Login(in.Email, in.Password)
 	if err != nil{
 		return &pb.LoginResp{
@@ -48,7 +47,7 @@ func (s *Server) Login(_ context.Context, in *pb.LoginRequest, opts ...grpc.Call
 		Token: token,
 	}, nil
 }
-func (s *Server) Auth(_ context.Context, in *pb.CheckTokenReq, opts ...grpc.CallOption) (*pb.CheckTokenResp, error) {
+func (s *Server) Auth(_ context.Context, in *pb.CheckTokenReq) (*pb.CheckTokenResp, error) {
 	id, ok, err := s.Storage.Auth(in.Token)
 	if err != nil{
 		return &pb.CheckTokenResp{
