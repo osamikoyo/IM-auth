@@ -2,3 +2,4 @@ port : 50051
 hostname : "localhost"
 dsn : "storage/main.db"
 jwt_key : "OGJWMGVOPJOWRGJKO34IGJ3IOJCVIU3HNGFUI3GHU5HG38HT38VHEURGBF3UGH3"
+rpc_que_name : "basket"

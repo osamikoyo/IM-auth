@@ -11,6 +11,7 @@ type Config struct {
 	Hostname string `yaml:"hostname"`
 	DSN string `yaml:"dsn"`
 	JwtKey string `yaml:"jwt_key"`
+	RpcQueName string `yaml:"rpc_que_name"`
 }
 
 func Load(cfgPath string) (*Config, error) {
